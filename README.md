@@ -11,4 +11,5 @@ Plugin requirements:
 # acknowledgements
 
 The basis for the rubydev playbook is from Ben Scofield: https://github.com/bscofield/ansible-playbooks
+
 Parts of the mysql playbook come from Four Kitchens: https://github.com/fourkitchens/server-playbooks
