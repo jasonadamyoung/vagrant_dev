@@ -1,0 +1,16 @@
+---
+
+# mysql installation
+
+- name: install mysql 
+  action: apt pkg=$item state=installed
+  with_items:
+   - mysql-server
+   - mysql-client
+  tags: mysql
+
+- name: copy mysql configuration file
+  copy: src=files/etc-mysql-my.cnf
+        dest=/etc/mysql/my.cnf
+  tags: mysql
+

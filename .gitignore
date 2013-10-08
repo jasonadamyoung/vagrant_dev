@@ -1,0 +1,4 @@
+# ignore .vagrant directory
+/.vagrant/
+# ignore the auto-generated ansible inventory file
+/vagrant_ansible_inventory_default
