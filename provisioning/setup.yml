@@ -2,4 +2,5 @@
 - hosts: all
   user: vagrant
   roles:
+  - database
   - railsdev

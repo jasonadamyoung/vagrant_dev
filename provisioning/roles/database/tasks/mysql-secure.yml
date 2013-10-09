@@ -1,0 +1,43 @@
+---
+##
+# original from:
+# https://github.com/fourkitchens/server-playbooks/blob/3762a1aec4a7f500cc0a6c7cb6754fd16113c126/common-tasks/mysql-secure.yml
+# MySQL database setup, this does the equivalent of mysql_secure_installation.
+#
+# Distribution independent.
+#
+- name: MySQL | Set the root password.
+  action: mysql_user user=root password={{ mysql_root_password }} host=localhost
+  tags: mysql
+
+- name: MySQL | Config for easy access as root user
+  action: template src=templates/dot-my-cnf.j2 dest=/home/{{ user }}/.my.cnf
+  tags: mysql
+
+- name: MySQL | Delete anonymous MySQL server user for $server_hostname
+  action: mysql_user user="" host="{{ server_hostname }}" state="absent"
+  tags: mysql
+
+- name: MySQL | Delete anonymous MySQL server user for localhost
+  action: mysql_user user="" state="absent"
+  tags: mysql
+
+- name: MySQL | Secure the MySQL root user for IPV6 localhost (::1)
+  action: mysql_user user="root" password="{{ mysql_root_password }}" host="::1"
+  tags: mysql
+
+- name: MySQL | Secure the MySQL root user for IPV4 localhost (127.0.0.1)
+  action: mysql_user user="root" password="{{ mysql_root_password }}" host="127.0.0.1"
+  tags: mysql
+
+- name: MySQL | Secure the MySQL root user for localhost domain (localhost)
+  action: mysql_user user="root" password="{{ mysql_root_password }}" host="localhost"
+  tags: mysql
+
+- name: MySQL | Secure the MySQL root user for $server_hostname domain
+  action: mysql_user user="root" password="{{ mysql_root_password }}" host="{{ server_hostname }}"
+  tags: mysql
+
+- name: MySQL | Remove the MySQL test database
+  action: mysql_db db=test state=absent
+  tags: mysql

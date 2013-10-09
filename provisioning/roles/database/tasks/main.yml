@@ -7,10 +7,12 @@
   with_items:
    - mysql-server
    - mysql-client
+   - python-mysqldb
   tags: mysql
 
 - name: copy mysql configuration file
-  copy: src=files/etc-mysql-my.cnf
+  copy: src=etc/mysql/my.cnf
         dest=/etc/mysql/my.cnf
   tags: mysql
 
+- include: mysql-secure.yml
