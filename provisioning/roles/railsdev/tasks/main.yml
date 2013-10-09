@@ -1,0 +1,76 @@
+---
+- name: Install required packages for ruby
+  apt: pkg={{item}} state=installed update_cache=yes
+  with_items:
+    - build-essential
+    - libssl-dev
+    - zlib1g-dev
+    - libreadline-dev
+    - libyaml-dev
+    - git-core
+    - libxslt1-dev  
+    - libxml2-dev
+    - apache2 
+    - apache2-prefork-dev 
+    - libapr1-dev 
+    - libaprutil1-dev
+    - libcurl4-openssl-dev
+
+- name: Remove vagrant ruby
+  file: path=/opt/ruby
+        state=absent
+
+- name: Create src directory
+  file: path=/usr/local/src
+        state=directory
+
+- name: Download Ruby
+  get_url: url=http://ftp.ruby-lang.org/pub/ruby/ruby-{{ ruby_version }}.tar.gz
+           dest=/usr/local/src/ruby.tgz
+
+- name: Expand Ruby
+  command: chdir=/usr/local/src
+           tar zxf ruby.tgz
+           creates=/usr/local/src/ruby-{{ ruby_version }}
+
+- name: Configure Ruby build
+  command: chdir=/usr/local/src/ruby-{{ ruby_version }}
+           ./configure --disable-install-rdoc
+           creates=/usr/local/src/ruby-{{ ruby_version }}/config.log
+
+- name: Make Ruby build
+  command: chdir=/usr/local/src/ruby-{{ ruby_version }}
+           make
+           creates=/usr/local/src/ruby-{{ ruby_version }}/main.o
+
+# The idempotency on this step is exceedingly suspect
+- name: Install Ruby
+  command: chdir=/usr/local/src/ruby-{{ ruby_version }}
+           sudo make install
+           creates=/usr/local/bin/ruby
+
+- name: Update Rubygems
+  command: gem update --system
+
+- name: Copy no-documentation gemrc
+  copy: src=etc/gemrc dest=/etc/gemrc
+
+- name: Install Bundler
+  gem:  name=bundler 
+        state=present 
+        user_install=no
+
+- name: Install Passenger
+  gem: name=passenger 
+       version={{ passenger_version }} 
+       state=present 
+       user_install=no
+
+- name: Obtain Gempath
+  shell: /usr/local/bin/gem environment gemdir
+  register: gemdir_result
+  ignore_errors: True
+
+- name: Build passenger module
+  shell: passenger-install-apache2-module --auto
+         creates={{ gemdir_result.stdout }}/gems/passenger-{{ passenger_version }}/buildout/apache2/mod_passenger.so
