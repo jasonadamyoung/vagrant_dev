@@ -1,16 +1,6 @@
 ---
-##
-# original from:
-# https://github.com/fourkitchens/server-playbooks/blob/3762a1aec4a7f500cc0a6c7cb6754fd16113c126/common-tasks/mysql-secure.yml
-# MySQL database setup, this does the equivalent of mysql_secure_installation.
-#
-# Distribution independent.
-#
-
-# 'localhost' needs to be the last item for idempotency, see
-# http://ansible.cc/docs/modules.html#mysql-user
 - name: update mysql root password for all root accounts
-  mysql_user: name=root host={{ item }} password={{ mysql_root_password }} priv=*.*:ALL,GRANT
+  mysql_user: login_unix_socket=/var/run/mysqld/mysqld.sock name=root host={{ item }} password={{ mysql_root_password }} priv=*.*:ALL,GRANT 
   with_items:
     - "{{ ansible_hostname }}"
     - 127.0.0.1
@@ -18,17 +8,17 @@
     - localhost
 
 - name: MySQL | Config for easy access as root user
-  action: template src=dot-my-cnf.j2 dest=~/.my.cnf
+  template: src=dot-my-cnf.j2 dest=~/.my.cnf
   tags: mysql
 
 - name: MySQL | Delete anonymous MySQL server user for 
-  action: mysql_user user="" host="{{ ansible_hostname }}" state="absent"
+  mysql_user: login_unix_socket=/var/run/mysqld/mysqld.sock user="" host="{{ ansible_hostname }}" state="absent"
   tags: mysql
 
 - name: MySQL | Delete anonymous MySQL server user for localhost
-  action: mysql_user user="" state="absent"
+  mysql_user: login_unix_socket=/var/run/mysqld/mysqld.sock user="" state="absent"
   tags: mysql
 
 - name: MySQL | Remove the MySQL test database
-  action: mysql_db db=test state=absent
+  mysql_db: login_unix_socket=/var/run/mysqld/mysqld.sock db=test state=absent
   tags: mysql
