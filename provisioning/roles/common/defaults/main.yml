@@ -1,0 +1,7 @@
+---
+core_packages:
+ - build-essential
+ - git
+ - tmux
+ - curl
+ - wget
