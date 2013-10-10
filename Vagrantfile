@@ -32,6 +32,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     ansible.verbose = 'vv'
     ansible.sudo = true
     ansible.playbook = "provisioning/setup.yml"
+    ansible.host_key_checking = false
   end
 
 end
