@@ -2,7 +2,7 @@
 
 # mysql installation
 - name: install mysql 
-  apt: pkg={{item}} state=installed update_cache=yes
+  apt: pkg={{item}} state=installed
   with_items:
    - mysql-server
    - mysql-client
