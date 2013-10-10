@@ -1,9 +1,8 @@
 ---
 
 # mysql installation
-
 - name: install mysql 
-  action: apt pkg=$item state=installed
+  apt: pkg={{item}} state=installed update_cache=yes
   with_items:
    - mysql-server
    - mysql-client
@@ -13,6 +12,8 @@
 - name: copy mysql configuration file
   copy: src=etc/mysql/my.cnf
         dest=/etc/mysql/my.cnf
+  notify:
+   - restart mysql
   tags: mysql
 
 - include: mysql-secure.yml
